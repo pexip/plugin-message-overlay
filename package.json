@@ -6,7 +6,6 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "test": "jest --detectOpenHandles --silent",
     "lint": "eslint ."
   },
   "keywords": [],
