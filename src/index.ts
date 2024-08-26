@@ -9,6 +9,10 @@ let button: Button<'settingsMenu'> | null = null
 let creatingButton = false
 const breakoutRooms = new Set<string>()
 
+plugin.events.connected.add(async () => {
+  breakoutRooms.clear()
+})
+
 plugin.events.conferenceStatus.add(async ({ id, status }) => {
   if (!status.directMedia && status.started) {
     await addButton()
@@ -19,6 +23,14 @@ plugin.events.conferenceStatus.add(async ({ id, status }) => {
 
 plugin.events.breakoutBegin.add(async (breakoutRoom) => {
   breakoutRooms.add(breakoutRoom.breakout_uuid)
+  const text = await getMessageOverlay()
+  if (text !== '') {
+    ;(plugin.conference as any).sendRequest({
+      method: 'POST',
+      path: `breakouts/${breakoutRoom.breakout_uuid}/set_message_text`,
+      payload: { text }
+    })
+  }
 })
 
 plugin.events.breakoutEnd.add(async (breakoutRoom) => {
