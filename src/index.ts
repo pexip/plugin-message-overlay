@@ -2,7 +2,7 @@ import { type Button, registerPlugin } from '@pexip/plugin-api'
 
 const plugin = await registerPlugin({
   id: 'message-overlay',
-  version: 0
+  version: 1
 })
 
 let button: Button<'settingsMenu'> | null = null
