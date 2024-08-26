@@ -7,17 +7,25 @@ const plugin = await registerPlugin({
 
 let button: Button<'settingsMenu'> | null = null
 let creatingButton = false
+const breakoutRooms = new Set<string>()
 
 plugin.events.conferenceStatus.add(async ({ id, status }) => {
-  if (id === 'main' && !status.directMedia && status.started) {
+  if (!status.directMedia && status.started) {
     await addButton()
   } else {
     await removeButton()
   }
 })
 
+plugin.events.breakoutBegin.add(async (breakoutRoom) => {
+  breakoutRooms.add(breakoutRoom.breakout_uuid)
+})
+
+plugin.events.breakoutEnd.add(async (breakoutRoom) => {
+  breakoutRooms.delete(breakoutRoom.breakout_uuid)
+})
+
 const addButton = async (): Promise<void> => {
-  console.log('addButton')
   if (button != null || creatingButton) {
     return
   }
@@ -46,7 +54,6 @@ const handleClickButton = async (): Promise<void> => {
   let currentMessage = ''
   try {
     currentMessage = await getMessageOverlay()
-    console.log(currentMessage)
   } catch (e) {
     console.error(e)
   }
@@ -73,9 +80,7 @@ const createForm = async (currentMessage: string): Promise<void> => {
   })
 
   form.onInput.add((result): void => {
-    handleFormSubmit(form, result).catch((e) => {
-      console.error(e)
-    })
+    handleFormSubmit(form, result).catch(console.error)
   })
 }
 
@@ -94,14 +99,22 @@ const getMessageOverlay = async (): Promise<string> => {
     method: 'GET',
     path: 'get_message_text'
   })
-  console.log(response)
   return response.data.result.text ?? ''
 }
 
 const setMessageOverlay = async (text: string): Promise<void> => {
-  await (plugin.conference as any).sendRequest({
+  ;(plugin.conference as any).sendRequest({
     method: 'POST',
     path: 'set_message_text',
     payload: { text }
+  })
+
+  // Change the overlay message to the breakout rooms
+  breakoutRooms.forEach((breakoutRoomUuid) => {
+    ;(plugin.conference as any).sendRequest({
+      method: 'POST',
+      path: `breakouts/${breakoutRoomUuid}/set_message_text`,
+      payload: { text }
+    })
   })
 }
