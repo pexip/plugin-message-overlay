@@ -1,40 +1,44 @@
 import { type Button, registerPlugin } from '@pexip/plugin-api'
+import { createSelectRoomForm } from './selectRoom'
+import { getMessageOverlay } from './messageOverlay'
+import { createInputMessageForm } from './inputMessage'
+import { setPlugin } from './plugin'
+import { getBreakoutRooms } from './breakoutRooms'
 
 const plugin = await registerPlugin({
   id: 'message-overlay',
   version: 1
 })
 
+setPlugin(plugin)
+
 let button: Button<'settingsMenu'> | null = null
 let creatingButton = false
-const breakoutRooms = new Set<string>()
 
-plugin.events.connected.add(async () => {
+const breakoutRooms = getBreakoutRooms()
+
+plugin.events.authenticatedWithConference.add(async () => {
   breakoutRooms.clear()
 })
 
+plugin.events.breakoutBegin.add(async (breakoutRoom) => {
+  breakoutRooms.set(breakoutRoom.breakout_uuid, '')
+})
+
+plugin.events.breakoutEnd.add(async (breakoutRoom) => {
+  breakoutRooms.delete(breakoutRoom.breakout_uuid)
+})
+
 plugin.events.conferenceStatus.add(async ({ id, status }) => {
+  if (breakoutRooms.has(id) && status.breakoutName != null) {
+    breakoutRooms.set(id, status.breakoutName)
+  }
+
   if (!status.directMedia && status.started) {
     await addButton()
   } else {
     await removeButton()
   }
-})
-
-plugin.events.breakoutBegin.add(async (breakoutRoom) => {
-  breakoutRooms.add(breakoutRoom.breakout_uuid)
-  const text = await getMessageOverlay()
-  if (text !== '') {
-    ;(plugin.conference as any).sendRequest({
-      method: 'POST',
-      path: `breakouts/${breakoutRoom.breakout_uuid}/set_message_text`,
-      payload: { text }
-    })
-  }
-})
-
-plugin.events.breakoutEnd.add(async (breakoutRoom) => {
-  breakoutRooms.delete(breakoutRoom.breakout_uuid)
 })
 
 const addButton = async (): Promise<void> => {
@@ -63,70 +67,17 @@ const removeButton = async (): Promise<void> => {
 }
 
 const handleClickButton = async (): Promise<void> => {
-  let currentMessage = ''
-  try {
-    currentMessage = await getMessageOverlay()
-  } catch (e) {
-    console.error(e)
-  }
-  await createForm(currentMessage)
-}
+  if (breakoutRooms.size > 0) {
+    await createSelectRoomForm(breakoutRooms)
+  } else {
+    const roomId = 'main'
+    let currentMessage = ''
 
-const createForm = async (currentMessage: string): Promise<void> => {
-  const form = await plugin.ui.addForm({
-    title: 'Set message overlay',
-    description:
-      'Write your message overlay text below. If you would like to get a new line press enter or make a new line in the textarea',
-    form: {
-      elements: {
-        message: {
-          name: 'Enter text',
-          type: 'textarea',
-          isOptional: true,
-          placeholder: 'Enter your message',
-          value: currentMessage
-        }
-      },
-      submitBtnTitle: 'Submit'
+    try {
+      currentMessage = await getMessageOverlay(roomId)
+    } catch (e) {
+      console.error(e)
     }
-  })
-
-  form.onInput.add((result): void => {
-    handleFormSubmit(form, result).catch(console.error)
-  })
-}
-
-const handleFormSubmit = async (
-  form: any,
-  result: {
-    message: string
+    await createInputMessageForm(roomId, currentMessage)
   }
-): Promise<void> => {
-  form?.remove()
-  await setMessageOverlay(result.message)
-}
-
-const getMessageOverlay = async (): Promise<string> => {
-  const response = await (plugin.conference as any).sendRequest({
-    method: 'GET',
-    path: 'get_message_text'
-  })
-  return response.data.result.text ?? ''
-}
-
-const setMessageOverlay = async (text: string): Promise<void> => {
-  ;(plugin.conference as any).sendRequest({
-    method: 'POST',
-    path: 'set_message_text',
-    payload: { text }
-  })
-
-  // Change the overlay message to the breakout rooms
-  breakoutRooms.forEach((breakoutRoomUuid) => {
-    ;(plugin.conference as any).sendRequest({
-      method: 'POST',
-      path: `breakouts/${breakoutRoomUuid}/set_message_text`,
-      payload: { text }
-    })
-  })
 }
