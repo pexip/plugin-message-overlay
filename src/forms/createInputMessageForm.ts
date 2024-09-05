@@ -1,5 +1,5 @@
 import { setMessageOverlay } from '../messageOverlay'
-import { getPlugin } from '../plugin'
+import { plugin } from '../plugin'
 
 export const createInputMessageForm = async (
   roomId: string,
@@ -7,8 +7,6 @@ export const createInputMessageForm = async (
   roomName?: string,
   breakoutRooms?: Map<string, string>
 ): Promise<void> => {
-  const plugin = getPlugin()
-
   const messageName =
     roomName != null ? `"${roomName}" message` : 'Room message'
 

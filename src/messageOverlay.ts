@@ -1,8 +1,6 @@
-import { getPlugin } from './plugin'
+import { plugin } from './plugin'
 
 export const getMessageOverlay = async (roomId: string): Promise<string> => {
-  const plugin = getPlugin()
-
   let path = 'get_message_text'
   if (roomId !== 'main') {
     path = `breakouts/${roomId}/${path}`
@@ -20,8 +18,6 @@ export const setMessageOverlay = async (
   roomId: string,
   text: string
 ): Promise<void> => {
-  const plugin = getPlugin()
-
   let path = 'set_message_text'
   if (roomId !== 'main') {
     path = `breakouts/${roomId}/${path}`
