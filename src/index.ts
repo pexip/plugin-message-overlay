@@ -1,15 +1,39 @@
 import { type Button, registerPlugin } from '@pexip/plugin-api'
+import { createSelectRoomForm } from './forms/createSelectRoomForm'
+import { getMessageOverlay } from './messageOverlay'
+import { createInputMessageForm } from './forms/createInputMessageForm'
+import { setPlugin } from './plugin'
 
 const plugin = await registerPlugin({
   id: 'message-overlay',
-  version: 0
+  version: 1
 })
+
+setPlugin(plugin)
 
 let button: Button<'settingsMenu'> | null = null
 let creatingButton = false
 
+const breakoutRooms = new Map<string, string>()
+
+plugin.events.authenticatedWithConference.add(async () => {
+  breakoutRooms.clear()
+})
+
+plugin.events.breakoutBegin.add(async (breakoutRoom) => {
+  breakoutRooms.set(breakoutRoom.breakout_uuid, '')
+})
+
+plugin.events.breakoutEnd.add(async (breakoutRoom) => {
+  breakoutRooms.delete(breakoutRoom.breakout_uuid)
+})
+
 plugin.events.conferenceStatus.add(async ({ id, status }) => {
-  if (id === 'main' && !status.directMedia && status.started) {
+  if (breakoutRooms.has(id) && status.breakoutName != null) {
+    breakoutRooms.set(id, status.breakoutName)
+  }
+
+  if (!status.directMedia && status.started) {
     await addButton()
   } else {
     await removeButton()
@@ -17,7 +41,6 @@ plugin.events.conferenceStatus.add(async ({ id, status }) => {
 })
 
 const addButton = async (): Promise<void> => {
-  console.log('addButton')
   if (button != null || creatingButton) {
     return
   }
@@ -43,65 +66,17 @@ const removeButton = async (): Promise<void> => {
 }
 
 const handleClickButton = async (): Promise<void> => {
-  let currentMessage = ''
-  try {
-    currentMessage = await getMessageOverlay()
-    console.log(currentMessage)
-  } catch (e) {
-    console.error(e)
-  }
-  await createForm(currentMessage)
-}
+  if (breakoutRooms.size > 0) {
+    await createSelectRoomForm(breakoutRooms)
+  } else {
+    const roomId = 'main'
+    let currentMessage = ''
 
-const createForm = async (currentMessage: string): Promise<void> => {
-  const form = await plugin.ui.addForm({
-    title: 'Set message overlay',
-    description:
-      'Write your message overlay text below. If you would like to get a new line press enter or make a new line in the textarea',
-    form: {
-      elements: {
-        message: {
-          name: 'Enter text',
-          type: 'textarea',
-          isOptional: true,
-          placeholder: 'Enter your message',
-          value: currentMessage
-        }
-      },
-      submitBtnTitle: 'Submit'
-    }
-  })
-
-  form.onInput.add((result): void => {
-    handleFormSubmit(form, result).catch((e) => {
+    try {
+      currentMessage = await getMessageOverlay(roomId)
+    } catch (e) {
       console.error(e)
-    })
-  })
-}
-
-const handleFormSubmit = async (
-  form: any,
-  result: {
-    message: string
+    }
+    await createInputMessageForm(roomId, currentMessage)
   }
-): Promise<void> => {
-  form?.remove()
-  await setMessageOverlay(result.message)
-}
-
-const getMessageOverlay = async (): Promise<string> => {
-  const response = await (plugin.conference as any).sendRequest({
-    method: 'GET',
-    path: 'get_message_text'
-  })
-  console.log(response)
-  return response.data.result.text ?? ''
-}
-
-const setMessageOverlay = async (text: string): Promise<void> => {
-  await (plugin.conference as any).sendRequest({
-    method: 'POST',
-    path: 'set_message_text',
-    payload: { text }
-  })
 }
