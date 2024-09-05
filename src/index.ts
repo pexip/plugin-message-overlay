@@ -1,9 +1,8 @@
 import { type Button, registerPlugin } from '@pexip/plugin-api'
-import { createSelectRoomForm } from './selectRoom'
+import { createSelectRoomForm } from './forms/createSelectRoomForm'
 import { getMessageOverlay } from './messageOverlay'
-import { createInputMessageForm } from './inputMessage'
+import { createInputMessageForm } from './forms/createInputMessageForm'
 import { setPlugin } from './plugin'
-import { getBreakoutRooms } from './breakoutRooms'
 
 const plugin = await registerPlugin({
   id: 'message-overlay',
@@ -15,7 +14,7 @@ setPlugin(plugin)
 let button: Button<'settingsMenu'> | null = null
 let creatingButton = false
 
-const breakoutRooms = getBreakoutRooms()
+const breakoutRooms = new Map<string, string>()
 
 plugin.events.authenticatedWithConference.add(async () => {
   breakoutRooms.clear()
