@@ -1,11 +1,12 @@
 import { createInputMessageForm } from './createInputMessageForm'
 import { getMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
+import { logger } from '../logger'
 
 export const createSelectRoomForm = async (
   breakoutRooms: Map<string, string>
 ): Promise<void> => {
-  const form = await plugin.ui.addForm({
+  const form = await plugin?.ui.addForm({
     title: 'Set message overlay',
     description: 'Choose the room you want to set the message overlay for.',
     form: {
@@ -34,21 +35,17 @@ export const createSelectRoomForm = async (
     }
   })
 
-  form.onInput.add(async (result): Promise<void> => {
+  form?.onInput.add(async (result): Promise<void> => {
     await form.remove()
 
-    if (result.room == null) {
-      return
-    }
-
-    const roomId = result.room
+    const { room: roomId } = result
     let currentMessage = ''
 
     if (roomId !== '') {
       try {
         currentMessage = await getMessageOverlay(result.room)
       } catch (e) {
-        console.error(e)
+        logger.error(e)
       }
     }
 

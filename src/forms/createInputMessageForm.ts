@@ -1,3 +1,4 @@
+import { logger } from '../logger'
 import { setMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
 
@@ -10,7 +11,7 @@ export const createInputMessageForm = async (
   const messageName =
     roomName != null ? `"${roomName}" message` : 'Room message'
 
-  const form = await plugin.ui.addForm({
+  const form = await plugin?.ui.addForm({
     title: 'Set message overlay',
     description:
       'Write your message overlay text below. If you would like to get a new line press enter or make a new line in the textarea',
@@ -28,20 +29,16 @@ export const createInputMessageForm = async (
     }
   })
 
-  form.onInput.add(async (result): Promise<void> => {
+  form?.onInput.add(async (result): Promise<void> => {
     await form.remove()
 
-    if (result.message == null) {
-      return
-    }
-
     if (roomId === '') {
-      setMessageOverlay('main', result.message).catch(console.error)
+      setMessageOverlay('main', result.message).catch(logger.error)
       breakoutRooms?.forEach((_breakoutName, breakoutUuid) => {
-        setMessageOverlay(breakoutUuid, result.message).catch(console.error)
+        setMessageOverlay(breakoutUuid, result.message).catch(logger.error)
       })
     } else {
-      setMessageOverlay(roomId, result.message).catch(console.error)
+      setMessageOverlay(roomId, result.message).catch(logger.error)
     }
   })
 }

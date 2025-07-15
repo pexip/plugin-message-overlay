@@ -3,10 +3,13 @@ import { createSelectRoomForm } from './forms/createSelectRoomForm'
 import { getMessageOverlay } from './messageOverlay'
 import { createInputMessageForm } from './forms/createInputMessageForm'
 import { setPlugin } from './plugin'
+import { logger } from './logger'
+
+const version = 1
 
 const plugin = await registerPlugin({
   id: 'message-overlay',
-  version: 1
+  version
 })
 
 setPlugin(plugin)
@@ -16,15 +19,15 @@ let creatingButton = false
 
 const breakoutRooms = new Map<string, string>()
 
-plugin.events.authenticatedWithConference.add(async () => {
+plugin.events.authenticatedWithConference.add(() => {
   breakoutRooms.clear()
 })
 
-plugin.events.breakoutBegin.add(async (breakoutRoom) => {
+plugin.events.breakoutBegin.add((breakoutRoom) => {
   breakoutRooms.set(breakoutRoom.breakout_uuid, '')
 })
 
-plugin.events.breakoutEnd.add(async (breakoutRoom) => {
+plugin.events.breakoutEnd.add((breakoutRoom) => {
   breakoutRooms.delete(breakoutRoom.breakout_uuid)
 })
 
@@ -54,7 +57,7 @@ const addButton = async (): Promise<void> => {
     })
     button.onClick.add(handleClickButton)
   } catch (e) {
-    console.error(e)
+    logger.error(e)
   }
 
   creatingButton = false
@@ -66,7 +69,8 @@ const removeButton = async (): Promise<void> => {
 }
 
 const handleClickButton = async (): Promise<void> => {
-  if (breakoutRooms.size > 0) {
+  const empty = 0
+  if (breakoutRooms.size > empty) {
     await createSelectRoomForm(breakoutRooms)
   } else {
     const roomId = 'main'
@@ -75,7 +79,7 @@ const handleClickButton = async (): Promise<void> => {
     try {
       currentMessage = await getMessageOverlay(roomId)
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
     await createInputMessageForm(roomId, currentMessage)
   }
