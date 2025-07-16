@@ -6,7 +6,11 @@ import { logger } from '../logger'
 export const createSelectRoomForm = async (
   breakoutRooms: Map<string, string>
 ): Promise<void> => {
-  const form = await plugin?.ui.addForm({
+  if (plugin == null) {
+    throw new Error('Plugin is not initialized.')
+  }
+
+  const form = await plugin.ui.addForm({
     title: 'Set message overlay',
     description: 'Choose the room you want to set the message overlay for.',
     form: {
@@ -35,7 +39,7 @@ export const createSelectRoomForm = async (
     }
   })
 
-  form?.onInput.add(async (result): Promise<void> => {
+  form.onInput.add(async (result): Promise<void> => {
     await form.remove()
 
     const { room: roomId } = result

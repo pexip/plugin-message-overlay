@@ -7,13 +7,17 @@ interface ConferenceWithSendRequest {
 }
 
 export const getMessageOverlay = async (roomId: string): Promise<string> => {
+  if (plugin == null) {
+    throw new Error('Plugin is not initialized.')
+  }
+
   let path = 'get_message_text'
   if (roomId !== 'main') {
     path = `breakouts/${roomId}/${path}`
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `plugin.conference` is typed as `any`
-  const conference = plugin?.conference as unknown as ConferenceWithSendRequest
+  const conference = plugin.conference as unknown as ConferenceWithSendRequest
   const response = await conference.sendRequest({
     method: 'GET',
     path
@@ -26,13 +30,17 @@ export const setMessageOverlay = async (
   roomId: string,
   text: string
 ): Promise<void> => {
+  if (plugin == null) {
+    throw new Error('Plugin is not initialized.')
+  }
+
   let path = 'set_message_text'
   if (roomId !== 'main') {
     path = `breakouts/${roomId}/${path}`
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `plugin.conference` is typed as `any`
-  const conference = plugin?.conference as unknown as ConferenceWithSendRequest
+  const conference = plugin.conference as unknown as ConferenceWithSendRequest
   await conference.sendRequest({
     method: 'POST',
     path,

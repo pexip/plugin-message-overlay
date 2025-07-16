@@ -11,7 +11,11 @@ export const createInputMessageForm = async (
   const messageName =
     roomName != null ? `"${roomName}" message` : 'Room message'
 
-  const form = await plugin?.ui.addForm({
+  if (plugin == null) {
+    throw new Error('Plugin is not initialized.')
+  }
+
+  const form = await plugin.ui.addForm({
     title: 'Set message overlay',
     description:
       'Write your message overlay text below. If you would like to get a new line press enter or make a new line in the textarea',
@@ -29,7 +33,7 @@ export const createInputMessageForm = async (
     }
   })
 
-  form?.onInput.add(async (result): Promise<void> => {
+  form.onInput.add(async (result): Promise<void> => {
     await form.remove()
 
     if (roomId === '') {
