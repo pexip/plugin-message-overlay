@@ -2,6 +2,7 @@ import { createInputMessageForm } from './createInputMessageForm'
 import { getMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
 import { logger } from '../logger'
+import i18next from 'i18next'
 
 export const createSelectRoomForm = async (
   breakoutRooms: Map<string, string>
@@ -11,22 +12,22 @@ export const createSelectRoomForm = async (
   }
 
   const form = await plugin.ui.addForm({
-    title: 'Set message overlay',
-    description: 'Choose the room you want to set the message overlay for.',
+    title: i18next.t('setMessageOverlay'),
+    description: i18next.t('selectRoomForm.description'),
     form: {
       elements: {
         room: {
-          name: 'Select room',
+          name: i18next.t('selectRoom'),
           type: 'select',
           isOptional: true,
           options: [
             {
               id: '',
-              label: 'All rooms'
+              label: i18next.t('allRooms')
             },
             {
               id: 'main',
-              label: 'Main room'
+              label: i18next.t('mainRoom')
             },
             ...Array.from(breakoutRooms).map(([roomId, roomName]) => ({
               id: roomId,
@@ -35,7 +36,7 @@ export const createSelectRoomForm = async (
           ]
         }
       },
-      submitBtnTitle: 'Choose'
+      submitBtnTitle: i18next.t('choose')
     }
   })
 
@@ -55,9 +56,9 @@ export const createSelectRoomForm = async (
 
     const roomName =
       roomId === ''
-        ? 'All rooms'
+        ? i18next.t('allRooms')
         : roomId === 'main'
-          ? 'Main room'
+          ? i18next.t('mainRoom')
           : breakoutRooms.get(roomId)
 
     await createInputMessageForm(roomId, currentMessage, roomName)

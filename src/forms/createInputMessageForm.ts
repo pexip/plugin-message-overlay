@@ -1,3 +1,4 @@
+import i18next from 'i18next'
 import { logger } from '../logger'
 import { setMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
@@ -9,27 +10,28 @@ export const createInputMessageForm = async (
   breakoutRooms?: Map<string, string>
 ): Promise<void> => {
   const messageName =
-    roomName != null ? `"${roomName}" message` : 'Room message'
+    roomName != null
+      ? `"${roomName}" ${i18next.t('message')}`
+      : i18next.t('roomMessage')
 
   if (plugin == null) {
     throw new Error('Plugin is not initialized.')
   }
 
   const form = await plugin.ui.addForm({
-    title: 'Set message overlay',
-    description:
-      'Write your message overlay text below. If you would like to get a new line press enter or make a new line in the textarea',
+    title: i18next.t('setMessageOverlay'),
+    description: i18next.t('inputMessageForm.description'),
     form: {
       elements: {
         message: {
           name: messageName,
           type: 'textarea',
           isOptional: true,
-          placeholder: 'Enter your message',
+          placeholder: i18next.t('enterYourMessage'),
           value: currentMessage
         }
       },
-      submitBtnTitle: 'Submit'
+      submitBtnTitle: i18next.t('submit')
     }
   })
 

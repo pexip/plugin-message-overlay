@@ -7,7 +7,5 @@ export default defineConfig({
   build: {
     target: 'esnext'
   },
-  plugins: [
-    mkcert()
-  ]
+  plugins: [mkcert()]
 })
