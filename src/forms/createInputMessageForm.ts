@@ -1,3 +1,4 @@
+import { logger } from '../logger'
 import { setMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
 
@@ -9,6 +10,10 @@ export const createInputMessageForm = async (
 ): Promise<void> => {
   const messageName =
     roomName != null ? `"${roomName}" message` : 'Room message'
+
+  if (plugin == null) {
+    throw new Error('Plugin is not initialized.')
+  }
 
   const form = await plugin.ui.addForm({
     title: 'Set message overlay',
@@ -31,17 +36,13 @@ export const createInputMessageForm = async (
   form.onInput.add(async (result): Promise<void> => {
     await form.remove()
 
-    if (result.message == null) {
-      return
-    }
-
     if (roomId === '') {
-      setMessageOverlay('main', result.message).catch(console.error)
+      setMessageOverlay('main', result.message).catch(logger.error)
       breakoutRooms?.forEach((_breakoutName, breakoutUuid) => {
-        setMessageOverlay(breakoutUuid, result.message).catch(console.error)
+        setMessageOverlay(breakoutUuid, result.message).catch(logger.error)
       })
     } else {
-      setMessageOverlay(roomId, result.message).catch(console.error)
+      setMessageOverlay(roomId, result.message).catch(logger.error)
     }
   })
 }
