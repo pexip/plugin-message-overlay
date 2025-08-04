@@ -2,7 +2,7 @@ import { createInputMessageForm } from './createInputMessageForm'
 import { getMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
 import { logger } from '../logger'
-import i18next from 'i18next'
+import { i18next } from '../i18n'
 
 export const createSelectRoomForm = async (
   breakoutRooms: Map<string, string>

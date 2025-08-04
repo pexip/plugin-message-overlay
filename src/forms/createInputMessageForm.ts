@@ -1,7 +1,7 @@
-import i18next from 'i18next'
 import { logger } from '../logger'
 import { setMessageOverlay } from '../messageOverlay'
 import { plugin } from '../plugin'
+import { i18next } from '../i18n'
 
 export const createInputMessageForm = async (
   roomId: string,
