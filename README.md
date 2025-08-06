@@ -8,13 +8,13 @@ to use this version or a later one.
 
 ## How to use
 
-To activate this feature the host user should click on the settings button
-located on the top-right corner. One thing to take into account is that this
-option will only be available during conferences.
+To activate this feature, the host must click the toolbar button. Note that this
+option is only available during conferences that do not use direct media. If the
+conference uses direct media, the button will not be available.
 
 <div align='center'>
 
-![settings panel](./images/settings.png)
+![button](./images/button.png)
 
 </div>
 
