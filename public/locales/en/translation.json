@@ -1,0 +1,17 @@
+{
+  "setMessageOverlay": "Set message overlay",
+  "roomMessage": "Room message",
+  "message": "message",
+  "enterYourMessage": "Enter your message",
+  "selectRoom": "Select room",
+  "allRooms": "All rooms",
+  "mainRoom": "Main room",
+  "submit": "Submit",
+  "choose": "Choose",
+  "inputMessageForm": {
+    "description": "Write your message overlay text below. If you would like to get a new line press enter or make a new line in the textarea."
+  },
+  "selectRoomForm": {
+    "description": "Choose the room you want to set the message overlay for."
+  }
+}

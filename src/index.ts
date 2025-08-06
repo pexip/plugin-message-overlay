@@ -4,6 +4,7 @@ import { getMessageOverlay } from './messageOverlay'
 import { createInputMessageForm } from './forms/createInputMessageForm'
 import { setPlugin } from './plugin'
 import { logger } from './logger'
+import { i18next } from './i18n'
 
 const version = 1
 
@@ -43,6 +44,14 @@ plugin.events.conferenceStatus.add(async ({ id, status }) => {
   }
 })
 
+plugin.events.languageSelect.add(async (language) => {
+  await i18next.changeLanguage(language).catch(logger.error)
+  if (button != null) {
+    await removeButton()
+    await addButton()
+  }
+})
+
 const addButton = async (): Promise<void> => {
   if (button != null || creatingButton) {
     return
@@ -51,7 +60,7 @@ const addButton = async (): Promise<void> => {
     creatingButton = true
     button = await plugin.ui.addButton({
       position: 'settingsMenu',
-      label: 'Set message overlay',
+      label: i18next.t('setMessageOverlay'),
       inMeetingOnly: true,
       roles: ['chair']
     })

@@ -1,0 +1,17 @@
+{
+  "setMessageOverlay": "Stel berichtoverlay in",
+  "roomMessage": "Kamerbericht",
+  "message": "bericht",
+  "enterYourMessage": "Voer uw bericht in",
+  "selectRoom": "Selecteer kamer",
+  "allRooms": "Alle kamers",
+  "mainRoom": "Hoofdkamer",
+  "submit": "Verzenden",
+  "choose": "Kiezen",
+  "inputMessageForm": {
+    "description": "Schrijf hieronder uw berichtoverlaytekst. Als u een nieuwe regel wilt, druk op enter of maak een nieuwe regel in het tekstvak."
+  },
+  "selectRoomForm": {
+    "description": "Kies de kamer waarvoor u de berichtoverlay wilt instellen."
+  }
+}
