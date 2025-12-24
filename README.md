@@ -27,6 +27,16 @@ that will appear on the remote video:
 
 </div>
 
+If you are using breakout rooms, you will see an additional option to choose if
+you want to show the message overlay in all the breakout rooms or only in one of
+them:
+
+<div align='center'>
+
+![breakout rooms](./images/breakout-rooms.png)
+
+</div>
+
 Once you click on "Submit", all the participants will see the message on the top
 of the screen:
 
