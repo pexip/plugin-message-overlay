@@ -55,6 +55,14 @@ of the screen:
   | -------- | ------- |
   | v20.12.2 | v10.5.0 |
 
+- Create a file `.env` in the root of the project with the following content:
+
+```env
+VITE_INFINITY_URL=<infinity_url>
+```
+
+You can check an example in the provided `.env.example` file.
+
 - Install all the dependencies:
 
 ```bash
