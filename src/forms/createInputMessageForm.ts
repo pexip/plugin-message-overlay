@@ -10,11 +10,11 @@ export const createInputMessageForm = async (
   breakoutRooms?: Map<string, string>
 ): Promise<void> => {
   const messageName =
-    roomName != null
-      ? `"${roomName}" ${i18next.t('message')}`
-      : i18next.t('roomMessage')
+    roomName === undefined
+      ? i18next.t('roomMessage')
+      : `"${roomName}" ${i18next.t('message')}`
 
-  if (plugin == null) {
+  if (plugin === null) {
     throw new Error('Plugin is not initialized.')
   }
 

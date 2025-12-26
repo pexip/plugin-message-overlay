@@ -7,7 +7,7 @@ interface ConferenceWithSendRequest {
 }
 
 export const getMessageOverlay = async (roomId: string): Promise<string> => {
-  if (plugin == null) {
+  if (plugin === null) {
     throw new Error('Plugin is not initialized.')
   }
 
@@ -30,7 +30,7 @@ export const setMessageOverlay = async (
   roomId: string,
   text: string
 ): Promise<void> => {
-  if (plugin == null) {
+  if (plugin === null) {
     throw new Error('Plugin is not initialized.')
   }
 
