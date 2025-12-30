@@ -23,9 +23,17 @@ export default defineConfig(({ mode }) => {
 
   if (mode === 'development') {
     if (!infinityTarget) {
-      throw new Error(
-        'Infinity URL is not defined. Please set VITE_INFINITY_TARGET value in the .env file. Check the README for more details.'
+      console.error('\n❌ Configuration Error: Missing Pexip Infinity URL ❌\n')
+      console.error(
+        'To run the dev server, create a .env file in the project root with:\n'
       )
+      console.error(
+        'VITE_INFINITY_TARGET=https://your-pexip-infinity-server.com\n'
+      )
+      console.error(
+        'See .env.example for reference or README.md for details.\n'
+      )
+      throw new Error('VITE_INFINITY_TARGET is not defined in .env file')
     }
   }
 
