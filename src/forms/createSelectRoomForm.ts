@@ -61,6 +61,11 @@ export const createSelectRoomForm = async (
           ? i18next.t('mainRoom')
           : breakoutRooms.get(roomId)
 
-    await createInputMessageForm(roomId, currentMessage, roomName)
+    await createInputMessageForm(
+      roomId,
+      currentMessage,
+      roomName,
+      breakoutRooms
+    )
   })
 }
