@@ -7,7 +7,7 @@ import { i18next } from '../i18n'
 export const createSelectRoomForm = async (
   breakoutRooms: Map<string, string>
 ): Promise<void> => {
-  if (plugin == null) {
+  if (plugin === null) {
     throw new Error('Plugin is not initialized.')
   }
 

@@ -36,7 +36,7 @@ plugin.events.breakoutEnd.add((breakoutRoom) => {
 })
 
 plugin.events.conferenceStatus.add(async ({ id, status }) => {
-  if (breakoutRooms.has(id) && status.breakoutName != null) {
+  if (breakoutRooms.has(id) && status.breakoutName !== undefined) {
     breakoutRooms.set(id, status.breakoutName)
   }
 
@@ -49,14 +49,14 @@ plugin.events.conferenceStatus.add(async ({ id, status }) => {
 
 plugin.events.languageSelect.add(async (language) => {
   await i18next.changeLanguage(language).catch(logger.error)
-  if (button != null) {
+  if (button !== null) {
     await removeButton()
     await addButton()
   }
 })
 
 const addButton = async (): Promise<void> => {
-  if (button != null || creatingButton) {
+  if (button !== null || creatingButton) {
     return
   }
   try {
