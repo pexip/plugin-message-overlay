@@ -1,4 +1,3 @@
-import path from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import mkcert from 'vite-plugin-mkcert'
 
@@ -55,11 +54,13 @@ export default defineConfig(({ mode }) => {
         name: 'inline-manifest',
         apply: 'serve', // only during dev
         configureServer(server) {
-          // Serve at /dev/manifest.json (matches existing proxy rewrite)
-          server.middlewares.use('/manifest.json', (req, res) => {
-            res.setHeader('Content-Type', 'application/json')
-            res.end(manifest)
-          })
+          server.middlewares.use(
+            '/webapp3/branding/manifest.json',
+            (req, res) => {
+              res.setHeader('Content-Type', 'application/json')
+              res.end(manifest)
+            }
+          )
         }
       }
     ],
@@ -69,16 +70,6 @@ export default defineConfig(({ mode }) => {
       allowedHosts: ['localhost'],
       port: port,
       proxy: {
-        '/webapp3/branding/manifest.json': {
-          target: `https://localhost:${port}`,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) =>
-            path.replace(
-              /^\/webapp3\/branding\/manifest\.json$/,
-              '/manifest.json'
-            )
-        },
         '/api': {
           target: infinityTarget,
           changeOrigin: true,
