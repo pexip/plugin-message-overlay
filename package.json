@@ -1,6 +1,6 @@
 {
   "name": "message-overlay",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Plugin that allows the host to display messages embedded in the video stream.",
   "main": "index.js",
   "scripts": {
