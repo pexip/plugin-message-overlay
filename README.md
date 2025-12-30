@@ -58,6 +58,7 @@ of the screen:
 - Create a file `.env` in the root of the project with the following content:
 
 ```env
+VITE_DEV_SERVER_PORT=<dev_server_port>
 VITE_INFINITY_TARGET=<infinity_url>
 ```
 

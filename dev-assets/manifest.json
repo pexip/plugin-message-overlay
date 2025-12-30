@@ -1,9 +1,0 @@
-{
-  "images": {},
-  "plugins": [
-    {
-      "src": "https://localhost:5173",
-      "sandboxValues": ["allow-same-origin"]
-    }
-  ]
-}

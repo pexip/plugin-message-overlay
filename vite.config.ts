@@ -1,19 +1,28 @@
 import path from 'path'
-import fs from 'fs'
 import { defineConfig, loadEnv } from 'vite'
 import mkcert from 'vite-plugin-mkcert'
-import serveStatic from 'serve-static'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  const port = 5173
-  const infinityUrl = env.VITE_INFINITY_TARGET
-  const devAssetsPath = path.resolve(__dirname, 'dev-assets')
+  const port = Number(env.VITE_DEV_SERVER_PORT) || 5173
+  const infinityTarget = env.VITE_INFINITY_TARGET
+
+  const manifestContent = {
+    images: {},
+    translations: {},
+    plugins: [
+      {
+        src: `https://localhost:${port}`,
+        sandboxValues: ['allow-same-origin']
+      }
+    ]
+  }
+  const manifest = JSON.stringify(manifestContent)
 
   if (mode === 'development') {
-    if (!infinityUrl) {
+    if (!infinityTarget) {
       throw new Error(
         'Infinity URL is not defined. Please set VITE_INFINITY_TARGET value in the .env file. Check the README for more details.'
       )
@@ -33,24 +42,16 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       mkcert(),
-      // Serve /dev-assets as /dev during dev mode only
+      // Inline manifest.json: serve in dev
       {
-        name: 'serve-dev-assets',
+        name: 'inline-manifest',
         apply: 'serve', // only during dev
         configureServer(server) {
-          if (fs.existsSync(devAssetsPath)) {
-            server.middlewares.use(
-              '/dev',
-              serveStatic(devAssetsPath, {
-                index: false
-              })
-            )
-            console.log('🟢 Serving /dev-assets at /dev')
-          } else {
-            console.warn(
-              '⚠️  dev-assets folder not found. Skipping static serving.'
-            )
-          }
+          // Serve at /dev/manifest.json (matches existing proxy rewrite)
+          server.middlewares.use('/manifest.json', (req, res) => {
+            res.setHeader('Content-Type', 'application/json')
+            res.end(manifest)
+          })
         }
       }
     ],
@@ -58,6 +59,7 @@ export default defineConfig(({ mode }) => {
     server: {
       open: '/webapp3/',
       allowedHosts: ['localhost'],
+      port: port,
       proxy: {
         '/webapp3/branding/manifest.json': {
           target: `https://localhost:${port}`,
@@ -66,16 +68,16 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) =>
             path.replace(
               /^\/webapp3\/branding\/manifest\.json$/,
-              '/dev/manifest.json'
+              '/manifest.json'
             )
         },
         '/api': {
-          target: infinityUrl,
+          target: infinityTarget,
           changeOrigin: true,
           secure: false
         },
         '/webapp3': {
-          target: infinityUrl,
+          target: infinityTarget,
           changeOrigin: true,
           secure: false
         }
